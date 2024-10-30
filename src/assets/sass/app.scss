@@ -1,0 +1,107 @@
+@import '../destyle.css';
+@import './card.scss';
+@import './timer.scss';
+@import './game.scss';
+@import './menu.scss';
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+$container-max-width: 1100px;
+
+$main-bg: #451c41;
+$secondary-bg: #e7d9e5;
+$main-text-color: #fff;
+$secondary-text-color: #212427;
+
+$btn-primary-hover-bg: #250222;
+$btn-secondary-bg: #4b832d;
+$btn-secondary-hover-bg: #0b390a;
+
+body {
+  font-family: 'Open Sans', sans-serif;
+}
+
+// Utils
+
+.flex-container {
+  display: flex;
+  justify-content: center;
+}
+
+.btn {
+  padding: 0.8rem 1.2rem;
+  display: flex;
+  justify-content: center;
+  transition: background-color 0.25s ease-in;
+}
+
+.btn_primary {
+  background-color: $main-bg;
+  color: $main-text-color;
+
+  &:hover {
+    background-color: $btn-primary-hover-bg;
+  }
+}
+
+.btn_secondary {
+  background-color: $btn-secondary-bg;
+  color: $main-text-color;
+
+  &:hover {
+    background-color: $btn-secondary-hover-bg;
+  }
+}
+
+.btn_whole-width {
+  width: 100%;
+}
+// Page Styles
+
+.page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+.header {
+  background-color: $main-bg;
+  color: $main-text-color;
+
+  &__container {
+    max-width: $container-max-width;
+    margin: 0 auto;
+  }
+
+  &__heading {
+    font-size: 1.5rem;
+    padding: 2rem 0;
+    font-family: Poppins, sans-serif;
+  }
+}
+
+.main {
+  padding: 1rem 0;
+  background-color: $secondary-bg;
+
+  &__container {
+    max-width: $container-max-width;
+    margin: 0 auto;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+  }
+}
+
+.footer {
+  background-color: $main-bg;
+  padding: 2rem 0;
+  color: $main-text-color;
+
+  &__container {
+    max-width: $container-max-width;
+    margin: 0 auto;
+  }
+}

@@ -1,0 +1,19 @@
+$secondary-text-color: #212427;
+
+.menu {
+  color: $secondary-text-color;
+
+  &__heading {
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
+  }
+
+  &__list-item + &__list-item {
+    margin-top: 1rem;
+  }
+
+  &__list {
+    display: grid;
+    grid-template-columns: 120px;
+  }
+}

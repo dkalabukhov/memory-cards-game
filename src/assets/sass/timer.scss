@@ -1,0 +1,9 @@
+.timer {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+
+  &__time {
+    font-size: 1.5rem;
+  }
+}
