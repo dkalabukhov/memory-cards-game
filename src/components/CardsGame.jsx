@@ -5,15 +5,17 @@ import cn from 'classnames';
 function reducer(state, { status }) {
   switch(status) {
     case 'reset':
-      return {...state, status: 'reset', isGameRunning: false }
+      return {...state, status: 'reset', isGameRunning: false };
+    case 'shuffling':
+      return { ...state, status: 'shuffling', isGameRunning: false };
     case 'preparing':
       return { ...state, status: 'preparing', isGameRunning: true };
     case 'starting':
       return { ...state, status: 'starting' };
     case 'lose':
-      return {...state, status: 'lose', isGameRunning: false}
+      return {...state, status: 'lose', isGameRunning: false};
     case 'win':
-      return {...state, status: 'win', isGameRunning: false}
+      return {...state, status: 'win', isGameRunning: false};
   }
 }
 
@@ -41,12 +43,10 @@ export default function CardsGame({ level, cards, shuffleCards }) {
 
   const handleReset = () => {
     dispatch({ status: 'reset' });
-  }
+  };
 
   const handleStartGame = () => {
-    setFlippedCards([]);
-    setMatchedCards([]);
-    dispatch({ status: 'preparing' });
+    dispatch({ status: 'shuffling' });
   };
 
   const handleTimerEnd = () => {
@@ -57,6 +57,15 @@ export default function CardsGame({ level, cards, shuffleCards }) {
     if (status !== 'starting') return;
     setFlippedCards((prevState) => [...prevState, card]);
   };
+
+  useEffect(() => {
+    if (status === 'shuffling') {
+      setFlippedCards([]);
+      setMatchedCards([]);
+      shuffleCards();
+      dispatch({ status: 'preparing' });
+    }
+  }, [status])
 
   useEffect(() => {
     if (flippedCards.length === 2) {
@@ -75,13 +84,6 @@ export default function CardsGame({ level, cards, shuffleCards }) {
   }, [flippedCards]);
 
   useEffect(() => {
-    if (status === 'preparing') {
-      if (flippedCards.length === 0 && matchedCards.length === 0) {
-        shuffleCards();
-      }
-  }}, [flippedCards, matchedCards, status]);
-
-  useEffect(() => {
     handleReset();
   }, [level]);
 
@@ -89,8 +91,8 @@ export default function CardsGame({ level, cards, shuffleCards }) {
     return cards.map((card) => {
       const {src, uId} = card;
       const cardClasses = cn('card', {
-        'card_show': status === 'preparing' || flippedCards.includes(card) || matchedCards[matchedCards.length - 1] === card.uId,
-        'card_open': matchedCards.slice(0, matchedCards.length - 1).includes(uId),
+        'card_show': (status === 'preparing' || flippedCards.includes(card) || matchedCards[matchedCards.length - 1] === card.uId) && status !== 'shuffling',
+        'card_open': matchedCards.slice(0, matchedCards.length - 1).includes(uId) && status !== 'shuffling',
       });
       return (
         <div key={uId} className={cardClasses}>
