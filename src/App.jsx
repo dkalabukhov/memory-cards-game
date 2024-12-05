@@ -9,9 +9,13 @@ export default function App() {
 
   const [shuffledCards, setShuffledCards] = useState([]);
 
-  const handleChoosingLevel = (value) => () => {
-    setLevel(value);
+  const handleChoosingLevel = (value) => {
+    setLevel(Number(value));
   };
+
+  const shuffleCards = () => {
+    setShuffledCards((value) => shuffle(value));
+  }
 
   useEffect(() => {
     const levelCards = cards.slice(0, Number(level / 2));
@@ -21,10 +25,13 @@ export default function App() {
     );
   }, [level])
 
-
-  const shuffleCards = () => {
-    setShuffledCards((value) => shuffle(value));
-  }
+  const menuLevels = {
+    6: '6 Cards',
+    8: '8 Cards',
+    10: '10 Cards',
+    12: '12 Cards',
+    16: '16 Cards',
+  };
 
   return (
     <div className="page">
@@ -36,7 +43,7 @@ export default function App() {
       <div className="main">
         <div className="main__container">
           <div className="main__grid">
-            <Menu handleChoosingLevel={handleChoosingLevel} />
+            <Menu handleChoosingLevel={handleChoosingLevel} menuLevels={menuLevels} />
             <CardsGame level={level} cards={shuffledCards} shuffleCards={shuffleCards} />
           </div>
         </div>

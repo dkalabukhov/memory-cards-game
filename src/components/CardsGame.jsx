@@ -1,6 +1,4 @@
 import { useEffect, useReducer, useState } from 'react';
-import Card from './Card.jsx';
-import { uniqueId } from 'lodash';
 import Timer from './Timer.jsx';
 import cn from 'classnames';
 
@@ -30,42 +28,11 @@ export default function CardsGame({ level, cards, shuffleCards }) {
 
   const { isGameRunning, status } = state;
 
-  const [ids, setIds] = useState([]);
-
-  const [uIds, setUIds] = useState([]);
-
-  const [openedCards, setOpenedCards] = useState([]);
-
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    if (ids.length === 2) {
-      const [firstId, secondId] = ids;
-      if (firstId === secondId) {
-        setIds([]);
-      } else {
-        handleLose();
-      }
-    }
-
-    if (uIds.length === level) {
-      handleWin({ status: 'win' });
-    }
-  }, [ids, uIds]);
-
-  useEffect(() => {
-    handleReset();
-  }, [level]);
-
-  useEffect(() => {
-    if (uIds.length > 1) {
-      setOpenedCards((value) => [...value, uIds[index]])
-      setIndex((value) => value + 1);
-    }
-  }, [uIds])
+  const [flippedCards, setFlippedCards] = useState([]);
+  const [matchedCards, setMatchedCards] = useState([]);
 
   const handleLose = () => {
-    dispatch({ status: 'lose' })
+    dispatch({ status: 'lose' });
   };
 
   const handleWin = () => {
@@ -77,32 +44,61 @@ export default function CardsGame({ level, cards, shuffleCards }) {
   }
 
   const handleStartGame = () => {
+    setFlippedCards([]);
+    setMatchedCards([]);
     dispatch({ status: 'preparing' });
-    shuffleCards();
-    setUIds([]);
-    setIds([]);
-    setOpenedCards([]);
-    setIndex(0);
   };
 
   const handleTimerEnd = () => {
     dispatch({ status: 'starting' });
   };
 
+  const handleOpenCard = (card) => {
+    if (status !== 'starting') return;
+    setFlippedCards((prevState) => [...prevState, card]);
+  };
+
+  useEffect(() => {
+    if (flippedCards.length === 2) {
+      const [firstCard, secondCard] = flippedCards;
+      if (firstCard.id === secondCard.id) {
+        setMatchedCards((prevState) => [...prevState, firstCard.uId, secondCard.uId]);
+        setFlippedCards([]);
+      } else {
+        handleLose();
+      }
+    }
+
+    if (matchedCards.length === cards.length && matchedCards.length !== 0) {
+      handleWin();
+    }
+  }, [flippedCards]);
+
+  useEffect(() => {
+    if (status === 'preparing') {
+      if (flippedCards.length === 0 && matchedCards.length === 0) {
+        shuffleCards();
+      }
+  }}, [flippedCards, matchedCards, status]);
+
+  useEffect(() => {
+    handleReset();
+  }, [level]);
+
   const renderCards = (cards) => {
-    return cards.map((card) => (
-      <Card
-        openedCards={openedCards}
-        uIds={uIds}
-        setUIds={setUIds}
-        ids={ids}
-        setIds={setIds}
-        status={status}
-        id={card.id}
-        uId={card.uId}
-        key={uniqueId()}
-        src={card.src} />
-    ));
+    return cards.map((card) => {
+      const {src, uId} = card;
+      const cardClasses = cn('card', {
+        'card_show': status === 'preparing' || flippedCards.includes(card) || matchedCards[matchedCards.length - 1] === card.uId,
+        'card_open': matchedCards.slice(0, matchedCards.length - 1).includes(uId),
+      });
+      return (
+        <div key={uId} className={cardClasses}>
+          <div className="card__front-side"><img className="card__img" src={src} alt="" /></div>
+          <div className="card__back-side"><img onClick={() => handleOpenCard(card)} className="card__img" src="/images/questionmark.png" alt=""/></div>
+        </div>
+      )
+    });
   };
 
   const gameGridClasses = cn('game__card-grid', {
@@ -117,7 +113,7 @@ export default function CardsGame({ level, cards, shuffleCards }) {
     <div className='game'>
       {!isGameRunning && <button onClick={() => handleStartGame()} className="btn btn_secondary">Start Game</button>}
       {(status === 'preparing') && <Timer level={level} handleTimerEnd={handleTimerEnd} />}
-      {(status !== 'preparing' && status !== 'waiting' && status !== 'lose' && status !== 'win' && status !== 'reset') && <h2 className="game__heading">The game has started</h2>}
+      {(status === 'starting' && status !== 'lose' && status !== 'win') && <h2 className="game__heading">The game has started</h2>}
       {(status === 'lose') && <h2 className='game__heading'>You have lost</h2> }
       {(status === 'win') && <h2 className='game__heading'>You have won</h2> }
       <div className={gameGridClasses}>
